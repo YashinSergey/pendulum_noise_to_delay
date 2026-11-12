@@ -11,3 +11,5 @@ dist/
 .env
 .env.*
 !.env.example
+artifacts/
+.pytest_cache/
