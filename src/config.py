@@ -16,10 +16,11 @@ VIDEO_EPISODE_SEED = 2000
 VIDEO_TRAIN_SEED = 42
 RANDOM_POLICY_SEED = 3000
 
-# Бюджет и параметры SAC выбираются после замера скорости в пилоте
 MAX_TRAIN_SECONDS = 1800
+TOTAL_TIMESTEPS = 30000
+EVAL_FREQUENCY = 5000
 
-# Стартовые настройки для технической проверки и пилота, ещё не итоговый протокол
+# Общие настройки зафиксированы после пилота, до основных запусков
 TORCH_THREADS = 1
 NET_ARCH = (64, 64)
 SAC_SETTINGS = {

@@ -4,6 +4,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import torch
 from stable_baselines3 import SAC
 
 from src import config
@@ -62,6 +63,7 @@ def summarize(episodes):
 
 
 def main():
+    torch.set_num_threads(config.TORCH_THREADS)
     parser = argparse.ArgumentParser()
     parser.add_argument("--runs", nargs="+", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)

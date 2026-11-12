@@ -41,8 +41,10 @@ class EvaluationCallback(BaseCallback):
         return True
 
     def _on_training_end(self):
-        if self.last_step != self.num_timesteps:
-            self.record()
+        # Оценка в _on_step предшествует обновлению весов на последнем шаге
+        if self.last_step == self.num_timesteps:
+            self.tables.pop()
+        self.record()
 
 
 def train(condition, seed, steps, output, eval_frequency, eval_seeds):
@@ -85,15 +87,19 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--condition", choices=config.CONDITIONS, required=True)
     parser.add_argument("--seed", type=int, required=True)
-    parser.add_argument("--steps", type=int, required=True)
+    parser.add_argument("--steps", type=int, default=config.TOTAL_TIMESTEPS)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--eval-frequency", type=int, default=5000)
+    parser.add_argument("--eval-frequency", type=int, default=config.EVAL_FREQUENCY)
     parser.add_argument("--split", choices=("pilot", "main"), default="pilot")
     args = parser.parse_args()
     seeds = config.PILOT_EVAL_SEEDS if args.split == "pilot" else config.INTERMEDIATE_EVAL_SEEDS
     allowed = config.PILOT_TRAIN_SEEDS if args.split == "pilot" else config.TRAIN_SEEDS
     if args.seed not in allowed:
         parser.error("Seed не входит в выбранный набор обучения")
+    if args.split == "main" and (
+        args.steps != config.TOTAL_TIMESTEPS or args.eval_frequency != config.EVAL_FREQUENCY
+    ):
+        parser.error("Основные запуски должны использовать зафиксированный бюджет и частоту оценки")
     train(args.condition, args.seed, args.steps, args.output, args.eval_frequency, seeds)
 
 
