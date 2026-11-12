@@ -18,3 +18,18 @@ RANDOM_POLICY_SEED = 3000
 
 # Бюджет и параметры SAC выбираются после замера скорости в пилоте
 MAX_TRAIN_SECONDS = 1800
+
+# Стартовые настройки для технической проверки и пилота, ещё не итоговый протокол
+TORCH_THREADS = 1
+NET_ARCH = (64, 64)
+SAC_SETTINGS = {
+    "learning_rate": 0.0003,
+    "buffer_size": 100000,
+    "learning_starts": 100,
+    "batch_size": 256,
+    "tau": 0.005,
+    "gamma": 0.99,
+    "train_freq": 1,
+    "gradient_steps": 1,
+    "ent_coef": "auto",
+}
