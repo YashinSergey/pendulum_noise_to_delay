@@ -1,3 +1,4 @@
+import argparse
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -25,8 +26,12 @@ def save(fig, path):
 def main():
     plt.switch_backend('Agg')
     root = Path(__file__).resolve().parents[1]
-    data = root / 'results/main'
-    output = root / 'results/figures'
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--data", type=Path, default=root / "results/main")
+    parser.add_argument("--output", type=Path, default=root / "results/figures")
+    args = parser.parse_args()
+    data = args.data
+    output = args.output
     output.mkdir(parents=True, exist_ok=True)
     training = pd.read_csv(data / 'training.csv')
     training['smoothed'] = training.groupby(['condition', 'train_seed']).reward.transform(

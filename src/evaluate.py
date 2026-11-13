@@ -72,8 +72,20 @@ def main():
     seeds = config.TEST_SEEDS if args.split == "test" else config.PILOT_EVAL_SEEDS
     args.output.mkdir(parents=True, exist_ok=False)
     tables = []
+    training_tables = []
+    intermediate_tables = []
     for run in args.runs:
         metadata = json.loads((run / "metadata.json").read_text())
+        training = pd.read_csv(run / "train.monitor.csv", comment="#").rename(
+            columns={"r": "reward", "l": "length", "t": "elapsed_seconds"}
+        )
+        training["timesteps"] = training.length.cumsum()
+        intermediate = pd.read_csv(run / "evaluation.csv")
+        for table in (training, intermediate):
+            table["condition"] = metadata["condition"]
+            table["train_seed"] = metadata["seed"]
+        training_tables.append(training)
+        intermediate_tables.append(intermediate)
         model = SAC.load(run / "model.zip", device=config.DEVICE)
         for delay in config.DELAYS:
             table = evaluate(model, seeds, delay)
@@ -82,6 +94,8 @@ def main():
             tables.append(table)
     episodes = pd.concat(tables, ignore_index=True)
     episodes.to_csv(args.output / "episodes.csv", index=False)
+    pd.concat(training_tables, ignore_index=True).to_csv(args.output / "training.csv", index=False)
+    pd.concat(intermediate_tables, ignore_index=True).to_csv(args.output / "intermediate.csv", index=False)
     runs, summary, effects = summarize(episodes)
     runs.to_csv(args.output / "runs.csv", index=False)
     summary.to_csv(args.output / "summary.csv", index=False)
