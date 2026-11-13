@@ -51,7 +51,7 @@ def main():
                                        color=COLORS[condition], label=condition)
                 axes[row, column].grid(alpha=0.25)
                 axes[row, column].legend()
-        axes[0, column].set(title=f'Задержка {delay} шага', ylabel='Угол, рад')
+        axes[0, column].set(title=f'Задержка, шаги: {delay}', ylabel='Угол, рад')
         axes[1, column].set(xlabel='Время, с', ylabel='Момент силы, Н·м')
     save(fig, output / 'behavior.png')
     print(table.groupby(['condition', 'delay']).reward.sum().to_string())
